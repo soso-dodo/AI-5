@@ -51,7 +51,11 @@ AI 기반 문체 변환 시스템
    pip install python-dotenv
    ```
 
-3. 실행
+3. openai api key 삽입
+   app.py에 있는 api key 넣는 부분에 key 넣어주기
+
+
+4. 실행
 
    ```bash
     python app.py
