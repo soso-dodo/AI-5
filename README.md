@@ -52,6 +52,8 @@ AI 기반 문체 변환 시스템
    ```
 
 3. openai api key 삽입
+
+   
    app.py에 있는 api key 넣는 부분에 key 넣어주기
 
 
