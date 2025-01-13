@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>텍스트 변환기</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --yellow: #fae100;
+            --basic-font-color: #2e363e;
+            --basic-font-size: 16px;
+            --horizontal-space: 1.2rem;
+            --main-border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            color: var(--basic-font-color);
+            font-size: var(--basic-font-size);
+            background-color: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 430px;
+            height: 90vh;
+            background-color: #abc1d1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-bar {
+            width: 100%;
+            max-width: 430px;
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 10px;
+            position: fixed;
+            top: 0;
+            background-color: #abc1d1;
+            box-sizing: border-box;
+        }
+
+        .status-bar__column {
+            width: 33%;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-bar__column:first-child span {
+            margin-right: 5px;
+        }
+
+        .status-bar__column:nth-child(2) {
+            display: flex;
+            justify-content: center;
+        }
+
+        .status-bar__column:last-child {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .status-bar__column:last-child i {
+            margin-left: 2px;
+        }
+
+        .status-bar__column:last-child span {
+            margin-right: 2px;
+        }
+
+        .alt-header {
+            width: 100%;
+            max-width: 430px;
+            padding: 15px var(--horizontal-space);
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 25px;
+            background-color: #abc1d1;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+
+        .alt-header__column {
+            width: 33%;
+            display: flex;
+            align-items: center;
+        }
+
+        .alt-header__column:first-child {
+            justify-content: flex-start;
+        }
+
+        .alt-header__column:nth-child(2) {
+            justify-content: center;
+        }
+
+        .alt-header__title {
+            font-size: 22px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .main-chat {
+            height: calc(100% - 180px);
+            overflow-y: auto;
+            margin-top: 85px;
+            padding: 0 15px;
+        }
+
+        .chat__timestamp {
+            color: white;
+            background-color: #92a4b2;
+            padding: 15px;
+            border-radius: 25px;
+            margin-bottom: 25px;
+        }
+
+        .message-row {
+            width: 100%;
+            display: flex;
+            margin-bottom: 25px;
+        }
+
+        .message-row--own {
+            justify-content: flex-end;
+        }
+
+        .message__bubble {
+            background-color: white;
+            padding: 13px;
+            border-radius: 15px;
+            border-top-left-radius: 0px;
+            margin-right: 5px;
+            font-size: 18px;
+        }
+
+        .message-row--own .message__bubble {
+            background-color: var(--yellow);
+            border-top-right-radius: 0px;
+            border-top-left-radius: 15px;
+            margin-right: 0;
+            margin-left: 5px;
+        }
+
+        .reply {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 430px;
+            background-color: white;
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 15px;
+            align-items: center;
+            box-sizing: border-box;
+            border-top: none;
+            gap: 8px;
+        }
+
+        .reply input {
+            flex: 1;
+            padding: 12px;
+            border: var(--main-border);
+            border-radius: 20px;
+            box-sizing: border-box;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .reply input:focus {
+            outline: none;
+            border-color: var(--yellow);
+        }
+
+        .settings-button {
+            background-color: transparent;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .settings-button i {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .settings-button:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .submit-button {
+            background-color: var(--yellow);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .submit-button i {
+            font-size: 14px;
+        }
+
+        .submit-button:hover {
+            background-color: #f7d736;
+        }
+
+        .style-selector-modal {
+            display: none;
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            background-color: rgba(248, 249, 250, 0.8);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .style-selector-content {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            font-size: 13px;
+            background-color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 6px;
+            height: 32px;
+            backdrop-filter: blur(8px);
+        }
+
+        select:last-child {
+            margin-bottom: 0;
+        }
+
+        .role-selector:last-child select {
+            margin-bottom: 0;
+        }
+
+        .role-selector {
+            display: none;
+            margin-top: 6px;
+        }
+
+        .role-selector.visible {
+            display: block;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 5px 0;
+        }
+
+        .toggle-label {
+            margin-right: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--yellow);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        #result {
+            width: 100%;
+            margin-bottom: 60px;
+        }
+
+        @media screen and (max-width: 430px) {
+            body {
+                padding: 0;
+            }
+            
+            .mobile-container {
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
+
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .preview-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .preview-text {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .preview-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .preview-buttons .confirm-btn {
+            background-color: var(--yellow);
+        }
+
+        .preview-buttons .cancel-btn {
+            background-color: #e9ecef;
+        }
+
+        /* 히스토리 관련 스타일 */
+        .history-button {
+            position: fixed;
+            right: 20px;
+            top: 90px;
+            background-color: var(--yellow);
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .history-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .history-content {
+            background-color: white;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .history-header {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .history-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .history-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .reset-btn {
+            background-color: #ff6b6b;
+            color: white;
+        }
+
+        .history-list {
+            margin-top: 10px;
+        }
+
+        .history-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-text {
+            margin-bottom: 5px;
+        }
+
+        .history-meta {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="status-bar">
+            <div class="status-bar__column">
+                <span>No Service</span>
+                <i class="fas fa-wifi"></i>
+            </div>
+            <div class="status-bar__column">
+                <span>18:43</span>
+            </div>
+            <div class="status-bar__column">
+                <span>100%</span>
+                <i class="fas fa-battery-full"></i>
+                <i class="fas fa-bolt"></i>
+            </div>
+        </div>
+
+        <header class="alt-header">
+            <div class="alt-header__column">
+                <i class="fas fa-angle-left fa-2x"></i>
+            </div>
+            <div class="alt-header__column">
+                <h1 class="alt-header__title">텍스트 변환기</h1>
+            </div>
+        </header>
+
+        <!-- 히스토리 버튼 추가 -->
+        <button class="history-button" onclick="toggleHistory()">
+            <i class="fas fa-history"></i>
+        </button>
+
+        <!-- 히스토리 모달 추가 -->
+        <div class="history-modal">
+            <div class="history-content">
+                <div class="history-header">
+                    <h3>변환 기록</h3>
+                    <div class="history-buttons">
+                        <button class="reset-btn" onclick="resetHistory()">초기화</button>
+                        <button class="cancel-btn" onclick="toggleHistory()">닫기</button>
+                    </div>
+                </div>
+                <div class="history-list"></div>
+            </div>
+        </div>
+
+        <main class="main-chat">
+            <div id="result"></div>
+        </main>
+
+        <div class="style-selector-modal" id="styleModal">
+            <div class="style-selector-content">
+                <select id="style" name="style" required>
+                    <option value="formal">격식체</option>
+                    <option value="business-situation">비즈니스 상황</option>
+                    <option value="comfort">위로</option>
+                    <option value="apology">공식적인 사과문</option>
+                    <option value="professor">대학교</option>
+                    <option value="refund">환불/반품 등 컴플레인</option>
+                    <option value="kindergarten">유치원</option>
+                </select>
+
+                <div id="businessRoleSelector" class="role-selector">
+                    <select id="businessRole" name="businessRole">
+                        <option value="business">부하직원이 상사에게</option>
+                        <option value="superior">상사가 부하직원에게</option>
+                    </select>
+                </div>
+
+                <div id="comfortRoleSelector" class="role-selector">
+                    <select id="comfortRole" name="comfortRole">
+                        <option value="comfort_formal">격식있게 위로하기</option>
+                        <option value="comfort_casual">친근하게 위로하기</option>
+                    </select>
+                </div>
+
+                <div id="professorRoleSelector" class="role-selector">
+                    <select id="professorRole" name="professorRole">
+                        <option value="professor_professor">교수님</option>
+                        <option value="professor_student">대학생</option>
+                    </select>
+                </div>
+
+                <div id="kindergartenRoleSelector" class="role-selector">
+                    <select id="kindergartenRole" name="kindergartenRole">
+                        <option value="kindergarten_teacher">선생님</option>
+                        <option value="kindergarten_parent">학부모</option>
+                    </select>
+                </div>
+
+                <div class="toggle-container">
+                    <span class="toggle-label">미리보기 없이 바로 전송</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="previewToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <form id="convertForm" class="reply">
+            <button type="button" class="settings-button" onclick="toggleStyleModal()">
+                <i class="fas fa-cog"></i>
+            </button>
+            <input type="text" id="text" name="text" placeholder="변환할 텍스트를 입력하세요..." required>
+            <button type="submit" class="submit-button">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+        </form>
+
+        <div class="preview-modal">
+            <div class="preview-content">
+                <h3 style="margin-bottom: 15px;">전송하시겠습니까?</h3>
+                <div class="preview-text"></div>
+                <div class="preview-buttons">
+                    <button class="cancel-btn">취소</button>
+                    <button class="confirm-btn">전송</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let previewText = '';
+        let previewStyle = '';
+        let previewResult = '';
+
+        document.getElementById('style').addEventListener('change', function() {
+            const professorRoleSelector = document.getElementById('professorRoleSelector');
+            const kindergartenRoleSelector = document.getElementById('kindergartenRoleSelector');
+            const businessRoleSelector = document.getElementById('businessRoleSelector');
+            const comfortRoleSelector = document.getElementById('comfortRoleSelector');
+
+            // 모든 role selector를 먼저 숨김
+            professorRoleSelector.classList.remove('visible');
+            kindergartenRoleSelector.classList.remove('visible');
+            businessRoleSelector.classList.remove('visible');
+            comfortRoleSelector.classList.remove('visible');
+
+            // 선택된 스타일에 따라 해당하는 selector를 표시
+            if (this.value === 'kindergarten') {
+                kindergartenRoleSelector.classList.add('visible');
+            } else if (this.value === 'professor') {
+                professorRoleSelector.classList.add('visible');
+            } else if (this.value === 'business-situation') {
+                businessRoleSelector.classList.add('visible');
+            } else if (this.value === 'comfort') {
+                comfortRoleSelector.classList.add('visible');
+            }
+        });
+
+        function toggleStyleModal() {
+            const modal = document.getElementById('styleModal');
+            const resultDiv = document.getElementById('result');
+            
+            if (modal.style.display === 'none' || !modal.style.display) {
+                modal.style.display = 'block';
+                resultDiv.style.marginBottom = '100px';
+            } else {
+                modal.style.display = 'none';
+                resultDiv.style.marginBottom = '60px';
+            }
+        }
+
+        // 히스토리 토글 함수
+        function toggleHistory() {
+            const modal = document.querySelector('.history-modal');
+            if (modal.style.display === 'none' || !modal.style.display) {
+                loadHistory();
+                modal.style.display = 'block';
+            } else {
+                modal.style.display = 'none';
+            }
+        }
+
+        // 히스토리 초기화 함수
+        async function resetHistory() {
+            if (confirm('모든 변환 기록을 삭제하시겠습니까?')) {
+                try {
+                    const response = await fetch('/reset-history', {
+                        method: 'POST'
+                    });
+                    
+                    if (response.ok) {
+                        const historyList = document.querySelector('.history-list');
+                        historyList.innerHTML = '';
+                        alert('변환 기록이 초기화되었습니다.');
+                    } else {
+                        alert('초기화 중 오류가 발생했습니다.');
+                    }
+                } catch (error) {
+                    console.error('초기화 오류:', error);
+                    alert('초기화 중 오류가 발생했습니다.');
+                }
+            }
+        }
+
+        // 히스토리 불러오기 함수
+        async function loadHistory() {
+            try {
+                const response = await fetch('/history');
+                const data = await response.json();
+                
+                const historyList = document.querySelector('.history-list');
+                historyList.innerHTML = '';
+                
+                data.forEach(item => {
+                    historyList.innerHTML += `
+                        <div class="history-item">
+                            <div class="history-text">
+                                <strong>원본:</strong> ${item.original_text}
+                            </div>
+                            <div class="history-text">
+                                <strong>변환:</strong> ${item.converted_text}
+                            </div>
+                            <div class="history-meta">
+                                <span>스타일: ${item.style}</span>
+                                <span>・</span>
+                                <span>${item.timestamp}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('히스토리 로딩 오류:', error);
+            }
+        }
+
+        document.getElementById('convertForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const style = document.getElementById('style').value;
+            const text = document.getElementById('text').value;
+            const skipPreview = document.getElementById('previewToggle').checked;
+            let selectedRole = '';
+
+            if (style === 'professor') {
+                selectedRole = document.getElementById('professorRole').value;
+            } else if (style === 'kindergarten') {
+                selectedRole = document.getElementById('kindergartenRole').value;
+            } else if (style === 'business-situation') {
+                selectedRole = document.getElementById('businessRole').value;
+            } else if (style === 'comfort') {
+                selectedRole = document.getElementById('comfortRole').value;
+            }
+
+            previewText = text;
+            previewStyle = selectedRole || style;
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: previewText,
+                        style: previewStyle
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.innerHTML += `
+                        <div class="message-row">
+                            <div class="message__bubble">${data.error}</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                previewResult = data.formatted_text || data.result;
+
+                if (skipPreview) {
+                    // 미리보기 없이 바로 전송
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.innerHTML += `
+                        <div class="message-row message-row--own">
+                            <div class="message__bubble">${previewResult}</div>
+                        </div>
+                    `;
+                    document.getElementById('text').value = '';
+                    window.scrollTo(0, document.body.scrollHeight);
+                } else {
+                    // 미리보기 모달 표시
+                    const previewModal = document.querySelector('.preview-modal');
+                    const previewTextDiv = document.querySelector('.preview-text');
+                    previewTextDiv.innerHTML = `
+                        <strong style="margin-bottom: 8px;">변환된 텍스트:</strong>
+                        <div style="text-align: left; padding-left: 0;">${previewResult}</div>
+                    `;
+                    previewModal.style.display = 'flex';
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML += `
+                    <div class="message-row">
+                        <div class="message__bubble">오류가 발생했습니다.</div>
+                    </div>
+                `;
+            }
+        });
+
+        // 취소 버튼 클릭 이벤트
+        document.querySelectorAll('.cancel-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // 가장 가까운 모달 찾기
+                const modal = this.closest('.preview-modal, .history-modal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // 전송 버튼 클릭 이벤트
+        document.querySelector('.confirm-btn').addEventListener('click', function() {
+            document.querySelector('.preview-modal').style.display = 'none';
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML += `
+                <div class="message-row message-row--own">
+                    <div class="message__bubble">${previewResult}</div>
+                </div>
+            `;
+            
+            document.getElementById('text').value = '';
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    </script>
+</body>
+</html>
