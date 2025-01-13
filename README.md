@@ -23,7 +23,8 @@ AI 기반 문체 변환 시스템
 - `CSS`
 - `JavaScript`
 - **Flamework** : Flask
-- 패키지 매니저 : pip
+- **DB** : SQLite
+- **패키지 매니저** : pip
 
 
 ## 🪄API
@@ -32,7 +33,7 @@ AI 기반 문체 변환 시스템
 
 
 ## ✔️사용법
-1. 가상환경 만들기
+1. cmd로 가상환경 만들기
 
    ```bash
    conda create -n project python=3.12
