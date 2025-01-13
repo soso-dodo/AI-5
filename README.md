@@ -40,7 +40,7 @@ AI 기반 문체 변환 시스템
    conda activate project
    ```
    
-2. Install dependencies
+2. dependencies 설치
 
    ```bash
    pip install flask
