@@ -19,4 +19,39 @@ AI 기반 문체 변환 시스템
 
 
 ## ⚙️개발 환경
-* 
+- [`Python 3.12`](https://github.com/conda-forge, "conda-forge")
+- `CSS`
+- `JavaScript`
+- **Flamework** : Flask
+- 패키지 매니저 : pip
+
+
+## 🪄API
+* OpenAI GPT API
+* version : GPT-4o-mini
+
+
+## ✔️사용법
+1. 가상환경 만들기
+
+   ```bash
+   conda create -n project python=3.12
+
+   conda activate project
+   ```
+   
+2. Install dependencies
+
+   ```bash
+   pip install flask
+
+   pip install openai
+
+   pip install python-dotenv
+   ```
+
+3. 실행
+
+   ```bash
+    python app.py
+   ```
