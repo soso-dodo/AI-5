@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from pytz import timezone
 import os
 import sys
 
@@ -26,7 +27,7 @@ class Conversation(db.Model):
     original_text = db.Column(db.Text, nullable=False)
     converted_text = db.Column(db.Text, nullable=False)
     style = db.Column(db.String(50), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone('Asia/Seoul')))
 
     def to_dict(self):
         return {
