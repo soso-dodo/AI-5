@@ -49,6 +49,8 @@ AI 기반 문체 변환 시스템
    pip install openai
 
    pip install python-dotenv
+
+   pip install flask_sqlalchemy
    ```
 
 3. openai api key 삽입
