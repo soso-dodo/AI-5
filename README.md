@@ -19,7 +19,7 @@ AI 기반 문체 변환 시스템
 
 
 ## ⚙️개발 환경
-- [`Python 3.12`](https://github.com/conda-forge, "conda-forge")
+- [`Python 3.12`](https://github.com/conda-forge "conda-forge")
 - `CSS`
 - `JavaScript`
 - **Flamework** : Flask
